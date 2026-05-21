@@ -1,29 +1,96 @@
 package main;
 
-import java.util.*;
+import java.util.HashMap;
 
 public class Empresa {
 
-	
-	public Empresa(String cuit2, String nombreFantasia2, String telefono2, String email2, String nombreContacto2) {
-		// TODO Auto-generated constructor stub
+	private String cuit;
+	private String nombreFantasia;
+
+	private HashMap<String, Usuario> autorizados;
+
+	public Empresa(String cuit, String nombreFantasia, String telefono, String email, String nombreContacto) {
+
+		this.cuit = cuit;
+
+		this.nombreFantasia = nombreFantasia;
+
+		this.autorizados = new HashMap<>();
 	}
 
-	String cuit;
-	String nombreFantasia;
-	String telefono;
-	String email;
-	String nombreContacto;
+	/*
+	 * CASO 1: El usuario ya existe
+	 */
 
-	HashSet<String> autorizados;
+	public void agregarAutorizado(Usuario usuario) {
 
-	public void agregarAutorizado(String dniAutorizado) {
-		// TODO Auto-generated method stub
-		
+		if (usuario == null)
+			throw new IllegalArgumentException("Usuario invalido");
+
+		if (autorizados.containsKey(usuario.getDni()))
+
+			throw new IllegalArgumentException("Usuario ya autorizado");
+
+		autorizados.put(usuario.getDni(), usuario);
+	}
+
+	/*
+	 * CASO 2: No existe usuario Se crea
+	 */
+
+	public void agregarAutorizado(String dni, String nombre, String telefono, String email) {
+
+		if (autorizados.containsKey(dni))
+
+			throw new IllegalArgumentException("Usuario ya autorizado");
+
+		Usuario nuevo = new Usuario(dni, nombre, telefono, email);
+
+		autorizados.put(dni, nuevo);
 	}
 
 	public boolean estaAutorizado(String dniUsuario) {
-		// TODO Auto-generated method stub
-		return false;
+
+		return autorizados.containsKey(dniUsuario);
 	}
+
+	public Usuario getAutorizado(String dni) {
+
+		return autorizados.get(dni);
+	}
+
+	public HashMap<String, Usuario> getAutorizados() {
+
+		return autorizados;
+	}
+
+	public String getCuit() {
+		return cuit;
+	}
+
+	public String getNombreFantasia() {
+
+		return nombreFantasia;
+	}
+
+	@Override
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Empresa: ");
+
+		sb.append(nombreFantasia);
+
+		sb.append(" | CUIT: ");
+
+		sb.append(cuit);
+
+		sb.append(" | Autorizados: ");
+
+		sb.append(autorizados.size());
+
+		return sb.toString();
+	}
+
 }

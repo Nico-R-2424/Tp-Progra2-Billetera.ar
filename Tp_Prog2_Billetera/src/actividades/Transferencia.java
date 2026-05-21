@@ -8,4 +8,9 @@ public class Transferencia extends Actividad {
 		// TODO Auto-generated constructor stub
 	}
 
+	public Integer getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

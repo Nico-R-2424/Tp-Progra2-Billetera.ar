@@ -2,54 +2,122 @@ package main;
 
 import java.util.*;
 
-import cuenta.Cuenta;
-import cuenta.CuentaCorporativa;
-import cuenta.CuentaPremium;
-import cuenta.CuentaRegular;
+import cuenta.*;
 
 public class Usuario {
 
-	public Usuario(String dni2, String nombre2, String telefono2, String email2) {
-		// TODO Auto-generated constructor stub
+	private String dni;
+
+	private String nombre;
+
+	private String telefono;
+
+	private String email;
+
+	private HashMap<String, Cuenta> cuentas;
+
+	private double totalInvertido;
+
+	public Usuario(String dni, String nombre, String telefono, String email) {
+
+		this.dni = dni;
+
+		this.nombre = nombre;
+
+		this.telefono = telefono;
+
+		this.email = email;
+
+		this.cuentas = new HashMap<>();
+
+		this.totalInvertido = 0;
 	}
 
-	String dni;
-	String nombre;
-	String telefono;
-	String email;
+	public String getDni() {
+		return dni;
+	}
 
-	HashMap<String, Cuenta> cuentas;
+	public String getNombre() {
+		return nombre;
+	}
 
-	double totalInvertido;
+	public String getTelefono() {
+		return telefono;
+	}
+
+	public String getEmail() {
+		return email;
+	}
 
 	public void agregarCuenta(CuentaRegular cuenta) {
-		// TODO Auto-generated method stub
-		
+
+		cuentas.put(cuenta.getCvu(), cuenta);
 	}
 
 	public void agregarCuenta(CuentaPremium cuenta) {
-		// TODO Auto-generated method stub
-		
+
+		cuentas.put(cuenta.getCvu(), cuenta);
 	}
 
 	public void agregarCuenta(CuentaCorporativa cuenta) {
-		// TODO Auto-generated method stub
-		
+
+		cuentas.put(cuenta.getCvu(), cuenta);
 	}
 
 	public Cuenta[] getCuentas() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return cuentas.values().toArray(new Cuenta[0]);
+	}
+
+	public Cuenta getCuenta(String cvu) {
+
+		return cuentas.get(cvu);
+	}
+
+	public boolean tieneCuenta(String cvu) {
+
+		return cuentas.containsKey(cvu);
 	}
 
 	public void sumarInversion(double monto) {
-		// TODO Auto-generated method stub
-		
+
+		totalInvertido += monto;
+	}
+
+	public void restarInversion(double monto) {
+
+		totalInvertido -= monto;
 	}
 
 	public double getTotalInvertido() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		return totalInvertido;
 	}
-	
+
+	@Override
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Usuario: ");
+
+		sb.append(nombre);
+
+		sb.append(" (");
+
+		sb.append(dni);
+
+		sb.append(") ");
+
+		sb.append("| cuentas: ");
+
+		sb.append(cuentas.size());
+
+		sb.append(" | invertido: $");
+
+		sb.append(totalInvertido);
+
+		return sb.toString();
+	}
+
 }

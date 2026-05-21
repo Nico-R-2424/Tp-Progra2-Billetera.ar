@@ -8,417 +8,438 @@ import interfaz.*;
 
 public class Billetera implements IBilletera {
 
-    private HashMap<String, Usuario> usuarios;
-    private HashMap<String, Cuenta> cuentas;
-    private HashMap<String, Empresa> empresas;
+	private HashMap<String, Usuario> usuarios;
+	private HashMap<String, Cuenta> cuentas;
+	private HashMap<String, Empresa> empresas;
 
-    private HashMap<Integer, Inversion> inversiones;
+	private HashMap<Integer, Inversion> inversiones;
 
-    private HashMap<String, String> aliasToCvu;
+	private HashMap<String, String> aliasToCvu;
 
-    private List<Actividad> historialGlobal;
+	private List<Actividad> historialGlobal;
 
-    public Billetera() {
-        usuarios = new HashMap<>();
-        cuentas = new HashMap<>();
-        empresas = new HashMap<>();
-        inversiones = new HashMap<>();
-        aliasToCvu = new HashMap<>();
-        historialGlobal = new ArrayList<>();
-    }
+	public Billetera() {
+		usuarios = new HashMap<>();
+		cuentas = new HashMap<>();
+		empresas = new HashMap<>();
+		inversiones = new HashMap<>();
+		aliasToCvu = new HashMap<>();
+		historialGlobal = new ArrayList<>();
+	}
 
-    @Override
-    public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,
-            String nombreContacto) {
+	@Override
+	public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,
+			String nombreContacto) {
 
-        if (empresas.containsKey(cuit)) {
-            throw new IllegalArgumentException("La empresa ya existe");
-        }
+		if (empresas.containsKey(cuit)) {
+			throw new IllegalArgumentException("La empresa ya existe");
+		}
 
-        Empresa e = new Empresa(cuit, nombreFantasia, telefono, email, nombreContacto);
+		Empresa e = new Empresa(cuit, nombreFantasia, telefono, email, nombreContacto);
 
-        empresas.put(cuit, e);
-    }
+		empresas.put(cuit, e);
+	}
 
-    @Override
-    public void agregarPersonaAutorizada(String cuitEmpresa, String dniAutorizado) {
+	@Override
+	public void agregarPersonaAutorizada(String cuitEmpresa, String dniAutorizado) {
 
-        Empresa empresa = empresas.get(cuitEmpresa);
+		Empresa empresa = empresas.get(cuitEmpresa);
 
-        if (empresa == null) {
-            throw new IllegalArgumentException("La empresa no existe");
-        }
+		if (empresa == null)
 
-        empresa.agregarAutorizado(dniAutorizado);
-    }
+			throw new IllegalArgumentException("La empresa no existe");
 
-    @Override
-    public void registrarUsuario(String dni, String nombre, String telefono, String email) {
+		/*
+		 * CAMINO 1 El usuario ya existe
+		 */
 
-        if (usuarios.containsKey(dni)) {
-            throw new IllegalArgumentException("El usuario ya existe");
-        }
+		if (usuarios.containsKey(dniAutorizado)) {
 
-        Usuario u = new Usuario(dni, nombre, telefono, email);
+			Usuario usuario = usuarios.get(dniAutorizado);
 
-        usuarios.put(dni, u);
-    }
+			empresa.agregarAutorizado(usuario);
+		}
 
-    @Override
-    public String crearCuentaRegular(String dniUsuario, String alias) {
+		/*
+		 * CAMINO 2 No existe Se crea automaticamente
+		 */
 
-        Usuario usuario = usuarios.get(dniUsuario);
+		else {
 
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario inexistente");
-        }
+			empresa.agregarAutorizado(dniAutorizado, "Usuario " + dniAutorizado, "-", "-");
 
-        if (aliasToCvu.containsKey(alias)) {
-            throw new IllegalArgumentException("Alias ya registrado");
-        }
+			Usuario nuevo = empresa.getAutorizado(dniAutorizado);
 
-        String cvu = Utilitarios.generarSiguienteCvu();
+			usuarios.put(dniAutorizado, nuevo);
+		}
 
-        CuentaRegular cuenta = new CuentaRegular(cvu, alias);
+	}
 
-        usuario.agregarCuenta(cuenta);
+	@Override
+	public void registrarUsuario(String dni, String nombre, String telefono, String email) {
 
-        cuentas.put(cvu, cuenta);
+		if (usuarios.containsKey(dni)) {
+			throw new IllegalArgumentException("El usuario ya existe");
+		}
 
-        aliasToCvu.put(alias, cvu);
+		Usuario u = new Usuario(dni, nombre, telefono, email);
 
-        return cvu;
-    }
+		usuarios.put(dni, u);
+	}
 
-    @Override
-    public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
+	@Override
+	public String crearCuentaRegular(String dniUsuario, String alias) {
 
-        Usuario usuario = usuarios.get(dniUsuario);
+		Usuario usuario = usuarios.get(dniUsuario);
 
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario inexistente");
-        }
+		if (usuario == null) {
+			throw new IllegalArgumentException("Usuario inexistente");
+		}
 
-        if (aliasToCvu.containsKey(alias)) {
-            throw new IllegalArgumentException("Alias ya registrado");
-        }
+		if (aliasToCvu.containsKey(alias)) {
+			throw new IllegalArgumentException("Alias ya registrado");
+		}
 
-        if (depositoInicial < 500000) {
-            throw new IllegalArgumentException("Saldo insuficiente para cuenta premium");
-        }
+		String cvu = Utilitarios.generarSiguienteCvu();
 
-        String cvu = Utilitarios.generarSiguienteCvu();
+		CuentaRegular cuenta = new CuentaRegular(cvu, alias);
 
-        CuentaPremium cuenta = new CuentaPremium(cvu, alias, depositoInicial);
+		usuario.agregarCuenta(cuenta);
 
-        usuario.agregarCuenta(cuenta);
+		cuentas.put(cvu, cuenta);
 
-        cuentas.put(cvu, cuenta);
+		aliasToCvu.put(alias, cvu);
 
-        aliasToCvu.put(alias, cvu);
+		return cvu;
+	}
 
-        return cvu;
-    }
+	@Override
+	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
 
-    @Override
-    public String crearCuentaCorporativa(String dniUsuario, String alias, String cuitEmpresa) {
+		Usuario usuario = usuarios.get(dniUsuario);
 
-        Usuario usuario = usuarios.get(dniUsuario);
+		if (usuario == null) {
+			throw new IllegalArgumentException("Usuario inexistente");
+		}
 
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario inexistente");
-        }
+		if (aliasToCvu.containsKey(alias)) {
+			throw new IllegalArgumentException("Alias ya registrado");
+		}
 
-        Empresa empresa = empresas.get(cuitEmpresa);
+		if (depositoInicial < 500000) {
+			throw new IllegalArgumentException("Saldo insuficiente para cuenta premium");
+		}
 
-        if (empresa == null) {
-            throw new IllegalArgumentException("Empresa inexistente");
-        }
+		String cvu = Utilitarios.generarSiguienteCvu();
 
-        if (!empresa.estaAutorizado(dniUsuario)) {
-            throw new IllegalArgumentException("Usuario no autorizado");
-        }
+		CuentaPremium cuenta = new CuentaPremium(cvu, alias, depositoInicial);
 
-        if (aliasToCvu.containsKey(alias)) {
-            throw new IllegalArgumentException("Alias ya registrado");
-        }
+		usuario.agregarCuenta(cuenta);
 
-        String cvu = Utilitarios.generarSiguienteCvu();
+		cuentas.put(cvu, cuenta);
 
-        CuentaCorporativa cuenta = new CuentaCorporativa(cvu, alias, empresa);
+		aliasToCvu.put(alias, cvu);
 
-        usuario.agregarCuenta(cuenta);
+		return cvu;
+	}
 
-        cuentas.put(cvu, cuenta);
+	@Override
+	public String crearCuentaCorporativa(String dniUsuario, String alias, String cuitEmpresa) {
 
-        aliasToCvu.put(alias, cvu);
+		Usuario usuario = usuarios.get(dniUsuario);
 
-        return cvu;
-    }
+		if (usuario == null) {
+			throw new IllegalArgumentException("Usuario inexistente");
+		}
 
-    @Override
-    public List<String> obtenerCuentas(String dniUsuario) {
+		Empresa empresa = empresas.get(cuitEmpresa);
 
-        Usuario usuario = usuarios.get(dniUsuario);
+		if (empresa == null) {
+			throw new IllegalArgumentException("Empresa inexistente");
+		}
 
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario inexistente");
-        }
+		if (!empresa.estaAutorizado(dniUsuario)) {
+			throw new IllegalArgumentException("Usuario no autorizado");
+		}
 
-        List<String> lista = new ArrayList<>();
+		if (aliasToCvu.containsKey(alias)) {
+			throw new IllegalArgumentException("Alias ya registrado");
+		}
 
-        for (Cuenta c : usuario.getCuentas()) {
-            lista.add(c.toString());
-        }
+		String cvu = Utilitarios.generarSiguienteCvu();
 
-        return lista;
-    }
+		CuentaCorporativa cuenta = new CuentaCorporativa(cvu, alias, empresa);
 
-    @Override
-    public double obtenerSaldoDisponible(String cvu) {
+		usuario.agregarCuenta(cuenta);
 
-        Cuenta cuenta = cuentas.get(cvu);
+		cuentas.put(cvu, cuenta);
 
-        if (cuenta == null) {
-            throw new IllegalArgumentException("Cuenta inexistente");
-        }
+		aliasToCvu.put(alias, cvu);
 
-        return cuenta.getSaldoDisponible();
-    }
+		return cvu;
+	}
 
-    @Override
-    public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
+	@Override
+	public List<String> obtenerCuentas(String dniUsuario) {
 
-        Cuenta origen = cuentas.get(cvuOrigen);
-        Cuenta destino = cuentas.get(cvuDestino);
+		Usuario usuario = usuarios.get(dniUsuario);
 
-        if (origen == null || destino == null) {
-            throw new IllegalArgumentException("Cuenta inexistente");
-        }
+		if (usuario == null) {
+			throw new IllegalArgumentException("Usuario inexistente");
+		}
 
-        if (origen.getSaldoDisponible() < monto) {
-            throw new IllegalArgumentException("Saldo insuficiente");
-        }
+		List<String> lista = new ArrayList<>();
 
-        origen.debitar(monto);
-        destino.acreditar(monto);
+		for (Cuenta c : usuario.getCuentas()) {
+			lista.add(c.toString());
+		}
 
-        Transferencia t = new Transferencia(origen, destino, monto);
+		return lista;
+	}
 
-        origen.agregarActividad(t);
-        destino.agregarActividad(t);
+	@Override
+	public double obtenerSaldoDisponible(String cvu) {
 
-        historialGlobal.add(t);
-    }
+		Cuenta cuenta = cuentas.get(cvu);
 
-    @Override
-    public int realizarInversionRentaFija(String dni, String cvu, double monto, int plazoDias) {
+		if (cuenta == null) {
+			throw new IllegalArgumentException("Cuenta inexistente");
+		}
 
-        Usuario usuario = usuarios.get(dni);
-        Cuenta cuenta = cuentas.get(cvu);
+		return cuenta.getSaldoDisponible();
+	}
 
-        if (usuario == null || cuenta == null) {
-            throw new IllegalArgumentException("Datos inválidos");
-        }
+	@Override
+	public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
 
-        cuenta.debitar(monto);
+		Cuenta origen = cuentas.get(cvuOrigen);
+		Cuenta destino = cuentas.get(cvuDestino);
 
-        InversionRentaFija inv = new InversionRentaFija(cuenta, monto, plazoDias);
+		if (origen == null || destino == null) {
+			throw new IllegalArgumentException("Cuenta inexistente");
+		}
 
-        inversiones.put(inv.getId(), inv);
+		if (origen.getSaldoDisponible() < monto) {
+			throw new IllegalArgumentException("Saldo insuficiente");
+		}
 
-        cuenta.agregarActividad(inv);
+		origen.debitar(monto);
+		destino.acreditar(monto);
 
-        historialGlobal.add(inv);
+		Transferencia t = new Transferencia(origen, destino, monto);
 
-        usuario.sumarInversion(monto);
+		origen.agregarActividad(t);
+		destino.agregarActividad(t);
 
-        return inv.getId();
-    }
+		historialGlobal.add(t);
+	}
 
-    @Override
-    public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa,
-            double tasa) {
+	@Override
+	public int realizarInversionRentaFija(String dni, String cvu, double monto, int plazoDias) {
 
-        Usuario usuario = usuarios.get(dni);
-        Cuenta cuenta = cuentas.get(cvu);
+		Usuario usuario = usuarios.get(dni);
+		Cuenta cuenta = cuentas.get(cvu);
 
-        if (usuario == null || cuenta == null) {
-            throw new IllegalArgumentException("Datos inválidos");
-        }
+		if (usuario == null || cuenta == null) {
+			throw new IllegalArgumentException("Datos inválidos");
+		}
 
-        cuenta.debitar(monto);
+		cuenta.debitar(monto);
 
-        InversionDivisa inv = new InversionDivisa(cuenta, monto, plazoDias, divisa, tasa);
+		InversionRentaFija inv = new InversionRentaFija(cuenta, monto, plazoDias);
 
-        inversiones.put(inv.getId(), inv);
+		inversiones.put(inv.getId(), inv);
 
-        cuenta.agregarActividad(inv);
+		cuenta.agregarActividad(inv);
 
-        historialGlobal.add(inv);
+		historialGlobal.add(inv);
 
-        usuario.sumarInversion(monto);
+		usuario.sumarInversion(monto);
 
-        return inv.getId();
-    }
+		return inv.getId();
+	}
 
-    @Override
-    public int realizarInversionLiquidez(String dni, String cvu, double monto, int plazoDias) {
+	@Override
+	public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa,
+			double tasa) {
 
-        Usuario usuario = usuarios.get(dni);
-        Cuenta cuenta = cuentas.get(cvu);
+		Usuario usuario = usuarios.get(dni);
+		Cuenta cuenta = cuentas.get(cvu);
 
-        if (usuario == null || cuenta == null) {
-            throw new IllegalArgumentException("Datos inválidos");
-        }
+		if (usuario == null || cuenta == null) {
+			throw new IllegalArgumentException("Datos inválidos");
+		}
 
-        if (!(cuenta instanceof CuentaCorporativa)) {
-            throw new IllegalArgumentException("Solo cuentas corporativas");
-        }
+		cuenta.debitar(monto);
 
-        if (monto < 20000000) {
-            throw new IllegalArgumentException("Monto insuficiente");
-        }
+		InversionDivisa inv = new InversionDivisa(cuenta, monto, plazoDias, divisa, tasa);
 
-        cuenta.debitar(monto);
+		inversiones.put(inv.getId(), inv);
 
-        FondoLiquidezEmpresarial inv =
-                new FondoLiquidezEmpresarial(cuenta, monto, plazoDias);
+		cuenta.agregarActividad(inv);
 
-        inversiones.put(inv.getId(), inv);
+		historialGlobal.add(inv);
 
-        cuenta.agregarActividad(inv);
+		usuario.sumarInversion(monto);
 
-        historialGlobal.add(inv);
+		return inv.getId();
+	}
 
-        usuario.sumarInversion(monto);
+	@Override
+	public int realizarInversionLiquidez(String dni, String cvu, double monto, int plazoDias) {
 
-        return inv.getId();
-    }
+		Usuario usuario = usuarios.get(dni);
+		Cuenta cuenta = cuentas.get(cvu);
 
-    @Override
-    public void precancelarInversion(String dni, String cvu, int idInversion) {
+		if (usuario == null || cuenta == null) {
+			throw new IllegalArgumentException("Datos inválidos");
+		}
 
-        Inversion inv = inversiones.get(idInversion);
+		if (!(cuenta instanceof CuentaCorporativa)) {
+			throw new IllegalArgumentException("Solo cuentas corporativas");
+		}
 
-        if (inv == null) {
-            throw new IllegalArgumentException("Inversion inexistente");
-        }
-        	
-        inv.precancelar();
-    }
+		if (monto < 20000000) {
+			throw new IllegalArgumentException("Monto insuficiente");
+		}
 
-    @Override
-    public String consultarCvu(String alias) {
+		cuenta.debitar(monto);
 
-        String cvu = aliasToCvu.get(alias);
+		FondoLiquidezEmpresarial inv = new FondoLiquidezEmpresarial(cuenta, monto, plazoDias);
 
-        if (cvu == null) {
-            throw new IllegalArgumentException("Alias inexistente");
-        }
+		inversiones.put(inv.getId(), inv);
 
-        return cvu;
-    }
+		cuenta.agregarActividad(inv);
 
-    @Override
-    public List<String> consultarHistorialGlobal() {
+		historialGlobal.add(inv);
 
-        List<String> lista = new ArrayList<>();
+		usuario.sumarInversion(monto);
 
-        for (Actividad a : historialGlobal) {
-            lista.add(a.toString());
-        }
+		return inv.getId();
+	}
 
-        return lista;
-    }
+	@Override
+	public void precancelarInversion(String dni, String cvu, int idInversion) {
 
-    @Override
-    public List<String> consultarHistorialCuenta(String cvu) {
+		Inversion inv = inversiones.get(idInversion);
 
-        Cuenta cuenta = cuentas.get(cvu);
+		if (inv == null) {
+			throw new IllegalArgumentException("Inversion inexistente");
+		}
 
-        if (cuenta == null) {
-            throw new IllegalArgumentException("Cuenta inexistente");
-        }
+		inv.precancelar();
+	}
 
-        List<String> lista = new ArrayList<>();
+	@Override
+	public String consultarCvu(String alias) {
 
-        for (Actividad a : cuenta.getActividades()) {
-            lista.add(a.toString());
-        }
+		String cvu = aliasToCvu.get(alias);
 
-        return lista;
-    }
+		if (cvu == null) {
+			throw new IllegalArgumentException("Alias inexistente");
+		}
 
-    @Override
-    public List<String> consultarHistorialUsuario(String dniUsuario) {
+		return cvu;
+	}
 
-        Usuario usuario = usuarios.get(dniUsuario);
+	@Override
+	public List<String> consultarHistorialGlobal() {
 
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario inexistente");
-        }
+		List<String> lista = new ArrayList<>();
 
-        List<String> lista = new ArrayList<>();
+		for (Actividad a : historialGlobal) {
+			lista.add(a.toString());
+		}
 
-        for (Cuenta c : usuario.getCuentas()) {
+		return lista;
+	}
 
-            for (Actividad a : c.getActividades()) {
-                lista.add(a.toString());
-            }
-        }
+	@Override
+	public List<String> consultarHistorialCuenta(String cvu) {
 
-        return lista;
-    }
+		Cuenta cuenta = cuentas.get(cvu);
 
-    @Override
-    public double obtenerTotalInvertido(String dniUsuario) {
+		if (cuenta == null) {
+			throw new IllegalArgumentException("Cuenta inexistente");
+		}
 
-        Usuario usuario = usuarios.get(dniUsuario);
+		List<String> lista = new ArrayList<>();
 
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuario inexistente");
-        }
+		for (Actividad a : cuenta.getActividades()) {
+			lista.add(a.toString());
+		}
 
-        return usuario.getTotalInvertido();
-    }
+		return lista;
+	}
 
-    @Override
-    public List<String> cuentasConMayorVolumen(int cantidadTop) {
+	@Override
+	public List<String> consultarHistorialUsuario(String dniUsuario) {
 
-        if (cantidadTop <= 0) {
-            throw new IllegalArgumentException("Cantidad inválida");
-        }
+		Usuario usuario = usuarios.get(dniUsuario);
 
-        List<Cuenta> lista = new ArrayList<>(cuentas.values());
+		if (usuario == null) {
+			throw new IllegalArgumentException("Usuario inexistente");
+		}
 
-        Collections.sort(lista,
-                (a, b) -> b.getVolumenTransacciones() - a.getVolumenTransacciones());
+		List<String> lista = new ArrayList<>();
 
-        List<String> resultado = new ArrayList<>();
+		for (Cuenta c : usuario.getCuentas()) {
 
-        for (int i = 0; i < cantidadTop && i < lista.size(); i++) {
-            resultado.add(lista.get(i).toString());
-        }
+			for (Actividad a : c.getActividades()) {
+				lista.add(a.toString());
+			}
+		}
 
-        return resultado;
-    }
+		return lista;
+	}
 
-    @Override
-    public String toString() {
+	@Override
+	public double obtenerTotalInvertido(String dniUsuario) {
 
-        StringBuilder sb = new StringBuilder();
+		Usuario usuario = usuarios.get(dniUsuario);
 
-        sb.append("=== BILLETERA ===\n");
+		if (usuario == null) {
+			throw new IllegalArgumentException("Usuario inexistente");
+		}
 
-        sb.append("Usuarios registrados: ").append(usuarios.size()).append("\n");
+		return usuario.getTotalInvertido();
+	}
 
-        sb.append("Cuentas registradas: ").append(cuentas.size()).append("\n");
+	@Override
+	public List<String> cuentasConMayorVolumen(int cantidadTop) {
 
-        sb.append("Empresas registradas: ").append(empresas.size()).append("\n");
+		if (cantidadTop <= 0) {
+			throw new IllegalArgumentException("Cantidad inválida");
+		}
 
-        sb.append("Actividades globales: ").append(historialGlobal.size()).append("\n");
+		List<Cuenta> lista = new ArrayList<>(cuentas.values());
 
-        return sb.toString();
-    }
+		Collections.sort(lista, (a, b) -> b.getVolumenTransacciones() - a.getVolumenTransacciones());
+
+		List<String> resultado = new ArrayList<>();
+
+		for (int i = 0; i < cantidadTop && i < lista.size(); i++) {
+			resultado.add(lista.get(i).toString());
+		}
+
+		return resultado;
+	}
+
+	@Override
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("=== BILLETERA ===\n");
+
+		sb.append("Usuarios registrados: ").append(usuarios.size()).append("\n");
+
+		sb.append("Cuentas registradas: ").append(cuentas.size()).append("\n");
+
+		sb.append("Empresas registradas: ").append(empresas.size()).append("\n");
+
+		sb.append("Actividades globales: ").append(historialGlobal.size()).append("\n");
+
+		return sb.toString();
+	}
 }
