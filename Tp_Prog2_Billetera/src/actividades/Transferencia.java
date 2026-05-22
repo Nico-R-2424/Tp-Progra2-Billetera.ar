@@ -4,13 +4,41 @@ import cuenta.Cuenta;
 
 public class Transferencia extends Actividad {
 
+	private Cuenta origen;
+	private Cuenta destino;
+
 	public Transferencia(Cuenta origen, Cuenta destino, double monto) {
-		// TODO Auto-generated constructor stub
+
+		super(monto);
+
+		this.origen = origen;
+		this.destino = destino;
 	}
 
-	public Integer getId() {
-		// TODO Auto-generated method stub
-		return null;
+	public Cuenta getOrigen() {
+		return origen;
+	}
+
+	public Cuenta getDestino() {
+		return destino;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	@Override
+	public String toString() {
+
+		String estado;
+
+		if (aprobada)
+			estado = "Aprobada";
+		else
+			estado = "Rechazada";
+
+		return "fecha: " + fecha + "\norigen: " + origen.getCvu() + "\ndestino: " + destino.getCvu() + "\nmonto: "
+				+ monto + "\n" + estado;
 	}
 
 }

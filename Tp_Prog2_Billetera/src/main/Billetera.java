@@ -19,11 +19,15 @@ public class Billetera implements IBilletera {
 	private List<Actividad> historialGlobal;
 
 	public Billetera() {
+
 		usuarios = new HashMap<>();
 		cuentas = new HashMap<>();
 		empresas = new HashMap<>();
+
 		inversiones = new HashMap<>();
+
 		aliasToCvu = new HashMap<>();
+
 		historialGlobal = new ArrayList<>();
 	}
 
@@ -31,9 +35,8 @@ public class Billetera implements IBilletera {
 	public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,
 			String nombreContacto) {
 
-		if (empresas.containsKey(cuit)) {
-			throw new IllegalArgumentException("La empresa ya existe");
-		}
+		if (empresas.containsKey(cuit))
+			throw new IllegalArgumentException("Empresa existente");
 
 		Empresa e = new Empresa(cuit, nombreFantasia, telefono, email, nombreContacto);
 
@@ -46,25 +49,18 @@ public class Billetera implements IBilletera {
 		Empresa empresa = empresas.get(cuitEmpresa);
 
 		if (empresa == null)
+			throw new IllegalArgumentException("Empresa inexistente");
 
-			throw new IllegalArgumentException("La empresa no existe");
-
-		/*
-		 * CAMINO 1 El usuario ya existe
-		 */
+		if (empresa.estaAutorizado(dniAutorizado))
+			throw new IllegalArgumentException("Ya autorizado");
 
 		if (usuarios.containsKey(dniAutorizado)) {
 
-			Usuario usuario = usuarios.get(dniAutorizado);
+			Usuario u = usuarios.get(dniAutorizado);
 
-			empresa.agregarAutorizado(usuario);
-		}
+			empresa.agregarAutorizado(u);
 
-		/*
-		 * CAMINO 2 No existe Se crea automaticamente
-		 */
-
-		else {
+		} else {
 
 			empresa.agregarAutorizado(dniAutorizado, "Usuario " + dniAutorizado, "-", "-");
 
@@ -72,15 +68,13 @@ public class Billetera implements IBilletera {
 
 			usuarios.put(dniAutorizado, nuevo);
 		}
-
 	}
 
 	@Override
 	public void registrarUsuario(String dni, String nombre, String telefono, String email) {
 
-		if (usuarios.containsKey(dni)) {
-			throw new IllegalArgumentException("El usuario ya existe");
-		}
+		if (usuarios.containsKey(dni))
+			throw new IllegalArgumentException("Usuario existente");
 
 		Usuario u = new Usuario(dni, nombre, telefono, email);
 
@@ -92,13 +86,11 @@ public class Billetera implements IBilletera {
 
 		Usuario usuario = usuarios.get(dniUsuario);
 
-		if (usuario == null) {
+		if (usuario == null)
 			throw new IllegalArgumentException("Usuario inexistente");
-		}
 
-		if (aliasToCvu.containsKey(alias)) {
-			throw new IllegalArgumentException("Alias ya registrado");
-		}
+		if (aliasToCvu.containsKey(alias))
+			throw new IllegalArgumentException("Alias existente");
 
 		String cvu = Utilitarios.generarSiguienteCvu();
 
@@ -116,19 +108,16 @@ public class Billetera implements IBilletera {
 	@Override
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
 
+		if (depositoInicial < 500000)
+			throw new IllegalArgumentException("Monto insuficiente");
+
 		Usuario usuario = usuarios.get(dniUsuario);
 
-		if (usuario == null) {
+		if (usuario == null)
 			throw new IllegalArgumentException("Usuario inexistente");
-		}
 
-		if (aliasToCvu.containsKey(alias)) {
-			throw new IllegalArgumentException("Alias ya registrado");
-		}
-
-		if (depositoInicial < 500000) {
-			throw new IllegalArgumentException("Saldo insuficiente para cuenta premium");
-		}
+		if (aliasToCvu.containsKey(alias))
+			throw new IllegalArgumentException("Alias existente");
 
 		String cvu = Utilitarios.generarSiguienteCvu();
 
@@ -148,23 +137,16 @@ public class Billetera implements IBilletera {
 
 		Usuario usuario = usuarios.get(dniUsuario);
 
-		if (usuario == null) {
-			throw new IllegalArgumentException("Usuario inexistente");
-		}
-
 		Empresa empresa = empresas.get(cuitEmpresa);
 
-		if (empresa == null) {
+		if (usuario == null)
+			throw new IllegalArgumentException("Usuario inexistente");
+
+		if (empresa == null)
 			throw new IllegalArgumentException("Empresa inexistente");
-		}
 
-		if (!empresa.estaAutorizado(dniUsuario)) {
-			throw new IllegalArgumentException("Usuario no autorizado");
-		}
-
-		if (aliasToCvu.containsKey(alias)) {
-			throw new IllegalArgumentException("Alias ya registrado");
-		}
+		if (!empresa.estaAutorizado(dniUsuario))
+			throw new IllegalArgumentException("No autorizado");
 
 		String cvu = Utilitarios.generarSiguienteCvu();
 
@@ -184,13 +166,13 @@ public class Billetera implements IBilletera {
 
 		Usuario usuario = usuarios.get(dniUsuario);
 
-		if (usuario == null) {
-			throw new IllegalArgumentException("Usuario inexistente");
-		}
+		if (usuario == null)
+			throw new IllegalArgumentException();
 
 		List<String> lista = new ArrayList<>();
 
 		for (Cuenta c : usuario.getCuentas()) {
+
 			lista.add(c.toString());
 		}
 
@@ -202,9 +184,8 @@ public class Billetera implements IBilletera {
 
 		Cuenta cuenta = cuentas.get(cvu);
 
-		if (cuenta == null) {
-			throw new IllegalArgumentException("Cuenta inexistente");
-		}
+		if (cuenta == null)
+			throw new IllegalArgumentException();
 
 		return cuenta.getSaldoDisponible();
 	}
@@ -213,22 +194,24 @@ public class Billetera implements IBilletera {
 	public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
 
 		Cuenta origen = cuentas.get(cvuOrigen);
+
 		Cuenta destino = cuentas.get(cvuDestino);
 
-		if (origen == null || destino == null) {
-			throw new IllegalArgumentException("Cuenta inexistente");
-		}
+		if (origen == null || destino == null)
 
-		if (origen.getSaldoDisponible() < monto) {
-			throw new IllegalArgumentException("Saldo insuficiente");
-		}
+			throw new IllegalArgumentException();
+
+		if (monto <= 0)
+			throw new IllegalArgumentException();
 
 		origen.debitar(monto);
+
 		destino.acreditar(monto);
 
 		Transferencia t = new Transferencia(origen, destino, monto);
 
 		origen.agregarActividad(t);
+
 		destino.agregarActividad(t);
 
 		historialGlobal.add(t);
@@ -237,12 +220,12 @@ public class Billetera implements IBilletera {
 	@Override
 	public int realizarInversionRentaFija(String dni, String cvu, double monto, int plazoDias) {
 
-		Usuario usuario = usuarios.get(dni);
+		Usuario u = usuarios.get(dni);
+
 		Cuenta cuenta = cuentas.get(cvu);
 
-		if (usuario == null || cuenta == null) {
-			throw new IllegalArgumentException("Datos inválidos");
-		}
+		if (u == null || cuenta == null)
+			throw new IllegalArgumentException();
 
 		cuenta.debitar(monto);
 
@@ -254,7 +237,7 @@ public class Billetera implements IBilletera {
 
 		historialGlobal.add(inv);
 
-		usuario.sumarInversion(monto);
+		u.sumarInversion(monto);
 
 		return inv.getId();
 	}
@@ -263,12 +246,9 @@ public class Billetera implements IBilletera {
 	public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa,
 			double tasa) {
 
-		Usuario usuario = usuarios.get(dni);
-		Cuenta cuenta = cuentas.get(cvu);
+		Usuario u = usuarios.get(dni);
 
-		if (usuario == null || cuenta == null) {
-			throw new IllegalArgumentException("Datos inválidos");
-		}
+		Cuenta cuenta = cuentas.get(cvu);
 
 		cuenta.debitar(monto);
 
@@ -280,7 +260,7 @@ public class Billetera implements IBilletera {
 
 		historialGlobal.add(inv);
 
-		usuario.sumarInversion(monto);
+		u.sumarInversion(monto);
 
 		return inv.getId();
 	}
@@ -288,20 +268,13 @@ public class Billetera implements IBilletera {
 	@Override
 	public int realizarInversionLiquidez(String dni, String cvu, double monto, int plazoDias) {
 
-		Usuario usuario = usuarios.get(dni);
 		Cuenta cuenta = cuentas.get(cvu);
 
-		if (usuario == null || cuenta == null) {
-			throw new IllegalArgumentException("Datos inválidos");
-		}
+		if (!(cuenta instanceof CuentaCorporativa))
+			throw new IllegalArgumentException();
 
-		if (!(cuenta instanceof CuentaCorporativa)) {
-			throw new IllegalArgumentException("Solo cuentas corporativas");
-		}
-
-		if (monto < 20000000) {
-			throw new IllegalArgumentException("Monto insuficiente");
-		}
+		if (monto < 20000000)
+			throw new IllegalArgumentException();
 
 		cuenta.debitar(monto);
 
@@ -313,8 +286,6 @@ public class Billetera implements IBilletera {
 
 		historialGlobal.add(inv);
 
-		usuario.sumarInversion(monto);
-
 		return inv.getId();
 	}
 
@@ -323,23 +294,23 @@ public class Billetera implements IBilletera {
 
 		Inversion inv = inversiones.get(idInversion);
 
-		if (inv == null) {
+		if (inv == null)
 			throw new IllegalArgumentException("Inversion inexistente");
-		}
+
+		Usuario usuario = usuarios.get(dni);
 
 		inv.precancelar();
+
+		usuario.restarInversion(inv.getMonto());
 	}
 
 	@Override
 	public String consultarCvu(String alias) {
 
-		String cvu = aliasToCvu.get(alias);
+		if (!aliasToCvu.containsKey(alias))
+			throw new IllegalArgumentException();
 
-		if (cvu == null) {
-			throw new IllegalArgumentException("Alias inexistente");
-		}
-
-		return cvu;
+		return aliasToCvu.get(alias);
 	}
 
 	@Override
@@ -347,9 +318,9 @@ public class Billetera implements IBilletera {
 
 		List<String> lista = new ArrayList<>();
 
-		for (Actividad a : historialGlobal) {
+		for (Actividad a : historialGlobal)
+
 			lista.add(a.toString());
-		}
 
 		return lista;
 	}
@@ -359,15 +330,11 @@ public class Billetera implements IBilletera {
 
 		Cuenta cuenta = cuentas.get(cvu);
 
-		if (cuenta == null) {
-			throw new IllegalArgumentException("Cuenta inexistente");
-		}
-
 		List<String> lista = new ArrayList<>();
 
-		for (Actividad a : cuenta.getActividades()) {
+		for (Actividad a : cuenta.getActividades())
+
 			lista.add(a.toString());
-		}
 
 		return lista;
 	}
@@ -377,18 +344,13 @@ public class Billetera implements IBilletera {
 
 		Usuario usuario = usuarios.get(dniUsuario);
 
-		if (usuario == null) {
-			throw new IllegalArgumentException("Usuario inexistente");
-		}
-
 		List<String> lista = new ArrayList<>();
 
-		for (Cuenta c : usuario.getCuentas()) {
+		for (Cuenta c : usuario.getCuentas())
 
-			for (Actividad a : c.getActividades()) {
+			for (Actividad a : c.getActividades())
+
 				lista.add(a.toString());
-			}
-		}
 
 		return lista;
 	}
@@ -398,27 +360,20 @@ public class Billetera implements IBilletera {
 
 		Usuario usuario = usuarios.get(dniUsuario);
 
-		if (usuario == null) {
-			throw new IllegalArgumentException("Usuario inexistente");
-		}
-
 		return usuario.getTotalInvertido();
 	}
 
 	@Override
 	public List<String> cuentasConMayorVolumen(int cantidadTop) {
 
-		if (cantidadTop <= 0) {
-			throw new IllegalArgumentException("Cantidad inválida");
-		}
-
 		List<Cuenta> lista = new ArrayList<>(cuentas.values());
 
-		Collections.sort(lista, (a, b) -> b.getVolumenTransacciones() - a.getVolumenTransacciones());
+		lista.sort((a, b) -> b.getVolumenTransacciones() - a.getVolumenTransacciones());
 
 		List<String> resultado = new ArrayList<>();
 
 		for (int i = 0; i < cantidadTop && i < lista.size(); i++) {
+
 			resultado.add(lista.get(i).toString());
 		}
 
@@ -432,13 +387,13 @@ public class Billetera implements IBilletera {
 
 		sb.append("=== BILLETERA ===\n");
 
-		sb.append("Usuarios registrados: ").append(usuarios.size()).append("\n");
+		sb.append("Usuarios: ").append(usuarios.size()).append("\n");
 
-		sb.append("Cuentas registradas: ").append(cuentas.size()).append("\n");
+		sb.append("Cuentas: ").append(cuentas.size()).append("\n");
 
-		sb.append("Empresas registradas: ").append(empresas.size()).append("\n");
+		sb.append("Empresas: ").append(empresas.size()).append("\n");
 
-		sb.append("Actividades globales: ").append(historialGlobal.size()).append("\n");
+		sb.append("Actividades: ").append(historialGlobal.size()).append("\n");
 
 		return sb.toString();
 	}

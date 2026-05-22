@@ -13,6 +13,24 @@ public class CuentaRegular extends Cuenta {
 	public double getLimiteSalarial() {
 		return LIMITE_SALARIAL;
 	}
+	
+	 @Override
+	    public void acreditar(
+	            double monto){
+
+	        if(
+	        saldoDisponible
+	        +
+	        monto
+	        >
+	        LIMITE_SALARIAL)
+
+	            throw new IllegalStateException(
+	                    "Limite excedido");
+
+	        saldoDisponible += monto;
+	    }
+
 
 	@Override
 	public String toString() {

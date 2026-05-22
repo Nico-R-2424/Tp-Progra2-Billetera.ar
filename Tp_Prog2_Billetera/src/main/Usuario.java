@@ -87,6 +87,10 @@ public class Usuario {
 	public void restarInversion(double monto) {
 
 		totalInvertido -= monto;
+
+		if (totalInvertido < 0)
+
+			totalInvertido = 0;
 	}
 
 	public double getTotalInvertido() {
