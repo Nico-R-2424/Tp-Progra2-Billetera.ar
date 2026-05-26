@@ -1,67 +1,103 @@
 package cuenta;
 
 import java.util.*;
-
-import actividades.Actividad;
-import actividades.FondoLiquidezEmpresarial;
-import actividades.InversionDivisa;
-import actividades.InversionRentaFija;
-import actividades.Transferencia;
+import actividades.*;
 
 public abstract class Cuenta {
 
-	String cvu;
-	String alias;
+	protected String cvu;
+	protected String alias;
 
-	double saldoDisponible;
+	protected double saldoDisponible;
 
-	List<Actividad> actividades;
+	protected HashMap<Integer, Actividad> actividades;
 
-	int volumenTransacciones;
+	protected int volumenTransacciones;
+
+	public Cuenta(String cvu, String alias) {
+
+		this.cvu = cvu;
+		this.alias = alias;
+
+		this.saldoDisponible = 0;
+
+		this.actividades = new HashMap<>();
+
+		this.volumenTransacciones = 0;
+	}
+
+	public String getCvu() {
+		return cvu;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
 
 	public double getSaldoDisponible() {
-		// TODO Auto-generated method stub
-		return 0;
+		return saldoDisponible;
 	}
 
 	public void debitar(double monto) {
-		// TODO Auto-generated method stub
-		
+
+		if (monto <= 0)
+			throw new IllegalArgumentException("Monto invalido");
+
+		if (saldoDisponible < monto)
+			throw new IllegalArgumentException("Saldo insuficiente");
+
+		saldoDisponible -= monto;
 	}
 
 	public void acreditar(double monto) {
-		// TODO Auto-generated method stub
-		
+
+		if (monto <= 0)
+			throw new IllegalArgumentException("Monto invalido");
+
+		saldoDisponible += monto;
 	}
 
 	public void agregarActividad(Transferencia t) {
-		// TODO Auto-generated method stub
-		
+
+		actividades.put(t.getId(), t);
+
+		volumenTransacciones++;
 	}
 
 	public void agregarActividad(InversionRentaFija inv) {
-		// TODO Auto-generated method stub
-		
+
+		actividades.put(inv.getId(), inv);
+
+		volumenTransacciones++;
 	}
 
 	public void agregarActividad(InversionDivisa inv) {
-		// TODO Auto-generated method stub
-		
+
+		actividades.put(inv.getId(), inv);
+
+		volumenTransacciones++;
 	}
 
 	public void agregarActividad(FondoLiquidezEmpresarial inv) {
-		// TODO Auto-generated method stub
-		
+
+		actividades.put(inv.getId(), inv);
+
+		volumenTransacciones++;
 	}
 
 	public Actividad[] getActividades() {
-		// TODO Auto-generated method stub
-		return null;
+
+		return actividades.values().toArray(new Actividad[0]);
 	}
 
 	public int getVolumenTransacciones() {
-		// TODO Auto-generated method stub
-		return 0;
+		return volumenTransacciones;
 	}
-	
+
+	@Override
+	public String toString() {
+
+		return alias + " (" + cvu + ") - Saldo: $" + saldoDisponible;
+	}
+
 }
