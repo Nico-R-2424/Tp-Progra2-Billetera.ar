@@ -1,9 +1,6 @@
 package main;
 
 import java.util.*;
-
-import actividades.Actividad;
-import actividades.Inversion;
 import cuenta.*;
 
 public class Usuario {
@@ -38,7 +35,7 @@ public class Usuario {
 	public String getDni() {
 		return dni;
 	}
-
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -75,7 +72,7 @@ public class Usuario {
 
 		return cuentas.get(cvu);
 	}
-
+	
 	public boolean tieneCuenta(String cvu) {
 
 		return cuentas.containsKey(cvu);
@@ -97,28 +94,10 @@ public class Usuario {
 
 	public double getTotalInvertido() {
 		
-		totalInvertido= 0.0;
-		
-		for(Cuenta cuenta : cuentas.values()) {
-			
-			Actividad [] cuentaActividad = cuenta.getActividades();
-			
-			for(Actividad act : cuentaActividad) {
-				
-				if(act instanceof Inversion) {
-					
-					Inversion inv = (Inversion) act;
-					
-					if(inv.estaActiva()) {
-						
-						totalInvertido += act.getMonto();
-					}
-				}
-			}
-		}
-					
 		return totalInvertido;
+		
 	}
+		
 
 	@Override
 	public String toString() {

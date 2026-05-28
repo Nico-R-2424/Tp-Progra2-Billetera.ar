@@ -1,15 +1,16 @@
 package actividades;
 
 import cuenta.Cuenta;
+import main.Usuario;
 import interfaz.Utilitarios;
 
 public class InversionRentaFija extends Inversion {
 
 	private double tasaInteres;
 
-	public InversionRentaFija(Cuenta cuenta, double monto, int plazoDias) {
+	public InversionRentaFija(Cuenta cuenta, double monto, int plazoDias, Usuario usuario) {
 
-		super(cuenta, monto, plazoDias);
+		super(cuenta, monto, plazoDias, usuario);
 
 		this.tasaInteres = 0.20; // tasa fija ejemplo
 	}
@@ -51,6 +52,8 @@ public class InversionRentaFija extends Inversion {
 			cuenta.acreditar(totalAcreditar);
 			
 			activa = false;
+			
+			montoInvertido = 0.0;
 		}
 
 		
@@ -66,7 +69,7 @@ public class InversionRentaFija extends Inversion {
 		else
 			estado = "Rechazada";
 
-		return "\ndesc: Renta Fija" + "\nmonto: " + monto + "\nplazo: " + plazoDias + "\n" + estado;
+		return "Inversion:" + "\nfecha: " + fecha + "\norigen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\ndesc: Renta Fija" + "\nmonto: " + monto + "\nplazo: " + plazoDias + "\n" + estado;
 	}
 
 }

@@ -1,6 +1,7 @@
 package actividades;
 
 import cuenta.Cuenta;
+import main.Usuario;
 import interfaz.Utilitarios;
 
 public class FondoLiquidezEmpresarial extends Inversion {
@@ -11,9 +12,9 @@ public class FondoLiquidezEmpresarial extends Inversion {
 	
 	private double tasa;
 
-	public FondoLiquidezEmpresarial(Cuenta cuenta, double monto, int plazoDias) {
+	public FondoLiquidezEmpresarial(Cuenta cuenta, double monto, int plazoDias, Usuario usuario) {
 
-		super(cuenta, monto, plazoDias);
+		super(cuenta, monto, plazoDias, usuario);
 
 		if (monto < MONTO_MINIMO)
 			throw new IllegalArgumentException("El fondo requiere minimo 20 millones");
@@ -63,7 +64,7 @@ public class FondoLiquidezEmpresarial extends Inversion {
 		else
 			estado = "Rechazada";
 
-		return "\ndesc: Fondo Liquidez Empresarial" + "\nmonto: " + monto + "\nplazo: " + plazoDias + "\n" + estado;
+		return "Inversion:" + "\nfecha: " + fecha + "\norigen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\ndesc: Fondo Liquidez Empresarial" + "\nmonto: " + monto + "\nplazo: " + plazoDias + "\n" + estado;
 	}
 
 }

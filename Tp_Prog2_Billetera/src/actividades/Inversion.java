@@ -3,11 +3,14 @@ package actividades;
 import java.time.LocalDate;
 
 import cuenta.Cuenta;
+import main.Usuario;
 import interfaz.Utilitarios;
 
 public abstract class Inversion extends Actividad {
 
     protected Cuenta cuenta;
+    
+    protected Usuario usuario;
 
     protected double montoInvertido;
 
@@ -17,11 +20,13 @@ public abstract class Inversion extends Actividad {
 
     protected boolean activa;
 
-    public Inversion(Cuenta cuenta, double monto, int plazoDias) {
+    public Inversion(Cuenta cuenta, double monto, int plazoDias, Usuario usuario) {
 
         super(monto);
 
         this.cuenta = cuenta;
+        
+        this.usuario = usuario;
 
         this.montoInvertido = monto;
 
