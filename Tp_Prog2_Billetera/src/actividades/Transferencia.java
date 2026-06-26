@@ -50,7 +50,7 @@ public class Transferencia extends Actividad {
 		else
 			estado = "Rechazada";
 
-		return "Transferencia:" + "\nfecha: " + fecha + "\norigen: " + Origen.getDni() + "(" + origen.getCvu() + ")" + "\ndestino: "  + "(" + destino.getCvu() + ")" + "\nmonto: " + monto + "\n" + estado;
+		return "Transferencia:" + "\nfecha: " + fecha + "\norigen: " + Origen.getDni() + "(" + origen.getCvu() + ")" + "\ndestino: " + Destino.getDni() + "(" + destino.getCvu() + ")" + "\nmonto: " + monto + "\n" + estado;
 	}
 
 }

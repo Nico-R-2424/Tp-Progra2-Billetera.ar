@@ -280,7 +280,7 @@ public class Billetera implements IBilletera {
 		Cuenta cuenta = usuario.getCuenta(cvu);
 
 		if (usuario == null || cuenta == null||!(cuenta instanceof CuentaCorporativa))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("El fondo requiere minimo 20 millones");
 
 		FondoLiquidezEmpresarial inv = new FondoLiquidezEmpresarial(cuenta, monto, plazoDias, usuario);
 		
