@@ -87,7 +87,8 @@ public class InversionDivisa extends Inversion {
 		else
 			estado = "Rechazada";
 
-		return "Inversion:" + "\nfecha: " + fecha + "\norigen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\ndesc: Divisa " + divisa + "\nmonto: " + monto + "\nplazo: " + plazoDias + "\n" + estado;
+		return "○ Inversion:" + "\n            ■   fecha: " + fecha + "\n                origen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\n                desc: Divisa " + divisa + "\n                monto: " + monto + "\n                plazo: " + plazoDias + "\n                " + estado;
+		
 	}
 
 }

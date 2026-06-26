@@ -64,7 +64,8 @@ public class FondoLiquidezEmpresarial extends Inversion {
 		else
 			estado = "Rechazada";
 
-		return "Inversion:" + "\nfecha: " + fecha + "\norigen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\ndesc: Fondo Liquidez Empresarial" + "\nmonto: " + monto + "\nplazo: " + plazoDias + "\n" + estado;
+		return "○ Inversion:" + "\n            ■   fecha: " + fecha + "\n                origen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\n                desc: Fondo Liquidez Empresarial " + "\n                monto: " + monto + "\n                plazo: " + plazoDias + "\n                " + estado;
+		
 	}
 
 }

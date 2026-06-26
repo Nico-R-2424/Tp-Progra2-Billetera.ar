@@ -15,20 +15,12 @@ public class CuentaRegular extends Cuenta {
 	}
 	
 	 @Override
-	    public void acreditar(
-	            double monto){
+	 public void acreditar(double montoInversionCuenta){
+		 
+		 if(saldoDisponible  + montoInversionCuenta  > LIMITE_SALARIAL)
+			 throw new IllegalStateException("Limite excedido");
 
-	        if(
-	        saldoDisponible
-	        +
-	        monto
-	        >
-	        LIMITE_SALARIAL)
-
-	            throw new IllegalStateException(
-	                    "Limite excedido");
-
-	        saldoDisponible += monto;
+	        saldoDisponible += montoInversionCuenta;
 	    }
 
 

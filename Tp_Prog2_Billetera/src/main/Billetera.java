@@ -32,15 +32,14 @@ public class Billetera implements IBilletera {
 	}
 
 	@Override
-	public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,
-			String nombreContacto) {
+	public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email, String nombreContacto) {
 
 		if (empresas.containsKey(cuit))
 			throw new IllegalArgumentException("Empresa existente");
 
-		Empresa e = new Empresa(cuit, nombreFantasia, telefono, email, nombreContacto);
+		Empresa empresa = new Empresa(cuit, nombreFantasia, telefono, email, nombreContacto);
 
-		empresas.put(cuit, e);
+		empresas.put(cuit, empresa);
 	}
 
 	@Override
@@ -56,9 +55,9 @@ public class Billetera implements IBilletera {
 
 		if (usuarios.containsKey(dniAutorizado)) {
 
-			Usuario u = usuarios.get(dniAutorizado);
+			Usuario usuario = usuarios.get(dniAutorizado);
 
-			empresa.agregarAutorizado(u);
+			empresa.agregarAutorizado(usuario);
 
 		} else {
 
@@ -107,9 +106,6 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
-
-		if (depositoInicial < 500000)
-			throw new IllegalArgumentException("Monto insuficiente");
 
 		Usuario usuario = usuarios.get(dniUsuario);
 
@@ -193,32 +189,32 @@ public class Billetera implements IBilletera {
 	@Override
 	public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
 
-		Usuario Origen = consultarCuenta(cvuOrigen);
+		Usuario origenUsuario = consultarCuenta(cvuOrigen);
 		
-		Usuario Destino = consultarCuenta(cvuDestino);
+		Usuario destinoUsuario = consultarCuenta(cvuDestino);
 		
-		Cuenta origen = Origen.getCuenta(cvuOrigen);
+		Cuenta origenCuenta = origenUsuario.getCuenta(cvuOrigen);
 
-		Cuenta destino = Destino.getCuenta(cvuDestino);
+		Cuenta destinoCuenta = destinoUsuario.getCuenta(cvuDestino);
 
-		if (origen == null || destino == null)
+		if (origenCuenta == null || destinoCuenta == null)
 
 			throw new IllegalArgumentException();
 
 		if (monto <= 0)
 			throw new IllegalArgumentException();
 
-		origen.debitar(monto);
+		Transferencia transferencia = new Transferencia(origenCuenta, destinoCuenta, monto, origenUsuario, destinoUsuario);
+		
+		origenCuenta.debitar(monto);
 
-		destino.acreditar(monto);
+		destinoCuenta.acreditar(monto);
 
-		Transferencia t = new Transferencia(origen, destino, monto, Origen, Destino);
+		origenCuenta.agregarActividad(transferencia);
 
-		origen.agregarActividad(t);
+		destinoCuenta.agregarActividad(transferencia);
 
-		destino.agregarActividad(t);
-
-		historialGlobal.add(t);
+		historialGlobal.add(transferencia);
 	}
 
 	@Override
@@ -233,22 +229,21 @@ public class Billetera implements IBilletera {
 
 		cuenta.debitar(monto);
 
-		InversionRentaFija inv = new InversionRentaFija(cuenta, monto, plazoDias, usuario);
+		InversionRentaFija inversion = new InversionRentaFija(cuenta, monto, plazoDias, usuario);
 
-		inversiones.put(inv.getId(), inv);
+		inversiones.put(inversion.getId(), inversion);
 
-		cuenta.agregarActividad(inv);
+		cuenta.agregarActividad(inversion);
 
-		historialGlobal.add(inv);
+		historialGlobal.add(inversion);
 
 		usuario.sumarInversion(monto);
 
-		return inv.getId();
+		return inversion.getId();
 	}
 
 	@Override
-	public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa,
-			double tasa) {
+	public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa, double tasa) {
 
 		Usuario usuario = usuarios.get(dni);
 
@@ -259,17 +254,17 @@ public class Billetera implements IBilletera {
 
 		cuenta.debitar(monto);
 
-		InversionDivisa inv = new InversionDivisa(cuenta, monto, plazoDias, divisa, tasa, usuario);
+		InversionDivisa inversion = new InversionDivisa(cuenta, monto, plazoDias, divisa, tasa, usuario);
 
-		inversiones.put(inv.getId(), inv);
+		inversiones.put(inversion.getId(), inversion);
 
-		cuenta.agregarActividad(inv);
+		cuenta.agregarActividad(inversion);
 
-		historialGlobal.add(inv);
+		historialGlobal.add(inversion);
 
 		usuario.sumarInversion(monto);
 
-		return inv.getId();
+		return inversion.getId();
 	}
 
 	@Override
@@ -282,17 +277,17 @@ public class Billetera implements IBilletera {
 		if (usuario == null || cuenta == null||!(cuenta instanceof CuentaCorporativa))
 			throw new IllegalArgumentException("El fondo requiere minimo 20 millones");
 
-		FondoLiquidezEmpresarial inv = new FondoLiquidezEmpresarial(cuenta, monto, plazoDias, usuario);
+		FondoLiquidezEmpresarial inversion = new FondoLiquidezEmpresarial(cuenta, monto, plazoDias, usuario);
 		
 		cuenta.debitar(monto);
 
-		inversiones.put(inv.getId(), inv);
+		inversiones.put(inversion.getId(), inversion);
 
-		cuenta.agregarActividad(inv);
+		cuenta.agregarActividad(inversion);
 
-		historialGlobal.add(inv);
+		historialGlobal.add(inversion);
 
-		return inv.getId();
+		return inversion.getId();
 	}
 
 	@Override
@@ -307,22 +302,22 @@ public class Billetera implements IBilletera {
 		
 		Actividad [] actividad = cuenta.getActividades();
 		
-		Inversion inv = null;
+		Inversion inversion = null;
 		
-		for(Actividad act : actividad) {
+		for(Actividad actividades : actividad) {
 			
-			if(act != null && act.getId() == idInversion && act instanceof Inversion) {
+			if(actividades != null && actividades.getId() == idInversion && actividades instanceof Inversion) {
 				
-				inv = (Inversion) act;
+				inversion = (Inversion) actividades;
 				
 				break;
 			}
 		}
 
-		if (inv == null || !inv.estaActiva())
+		if (inversion == null || !inversion.estaActiva())
 			throw new IllegalArgumentException("Inversion inexistente");
 
-		inv.precancelar();
+		inversion.precancelar();
 		
 	}
 
@@ -340,9 +335,9 @@ public class Billetera implements IBilletera {
 
 		List<String> lista = new ArrayList<>();
 
-		for (Actividad act : historialGlobal) {
+		for (Actividad actividades : historialGlobal) {
 
-			lista.add(act.toString());
+			lista.add(actividades.toString());
 		}
 
 		return lista;
@@ -358,9 +353,9 @@ public class Billetera implements IBilletera {
 
 		List<String> lista = new ArrayList<>();
 
-		for (Actividad act : cuenta.getActividades())
+		for (Actividad actividades : cuenta.getActividades())
 
-			lista.add(act.toString());
+			lista.add(actividades.toString());
 
 		return lista;
 	}
@@ -377,9 +372,9 @@ public class Billetera implements IBilletera {
 
 		for (Cuenta cuenta : usuario.getCuentas())
 
-			for (Actividad act : cuenta.getActividades())
+			for (Actividad actividades : cuenta.getActividades())
 
-				lista.add(act.toString());
+				lista.add(actividades.toString());
 
 		return lista;
 	}
@@ -398,13 +393,13 @@ public class Billetera implements IBilletera {
 			
 			Actividad [] cuentaActividad = cuenta.getActividades();
 			
-			for(Actividad act : cuentaActividad) {
+			for(Actividad actividades : cuentaActividad) {
 				
-				if(act instanceof Inversion) {
+				if(actividades instanceof Inversion) {
 					
-					Inversion inv = (Inversion) act;
+					Inversion inversion = (Inversion) actividades;
 					
-					if(!inv.estaActiva()) {
+					if(!inversion.estaActiva()) {
 						
 						return totalInvertido;
 				}
