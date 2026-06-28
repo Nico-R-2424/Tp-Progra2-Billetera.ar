@@ -1,7 +1,6 @@
 package main;
 
 import java.util.*;
-
 import cuenta.*;
 
 public class Usuario {
@@ -36,7 +35,7 @@ public class Usuario {
 	public String getDni() {
 		return dni;
 	}
-
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -73,7 +72,7 @@ public class Usuario {
 
 		return cuentas.get(cvu);
 	}
-
+	
 	public boolean tieneCuenta(String cvu) {
 
 		return cuentas.containsKey(cvu);
@@ -94,9 +93,11 @@ public class Usuario {
 	}
 
 	public double getTotalInvertido() {
-
+		
 		return totalInvertido;
+		
 	}
+		
 
 	@Override
 	public String toString() {

@@ -1,7 +1,7 @@
 package cuenta;
 
-import java.util.*;
 import actividades.*;
+import java.util.*;
 
 public abstract class Cuenta {
 
@@ -97,7 +97,7 @@ public abstract class Cuenta {
 	@Override
 	public String toString() {
 
-		return alias + " (" + cvu + ") - Saldo: $" + saldoDisponible;
+		return "\u25CB " + alias + " (" + cvu + ") - Saldo: $" + saldoDisponible;
 	}
 
 }

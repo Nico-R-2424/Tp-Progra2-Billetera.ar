@@ -2,6 +2,7 @@ package actividades;
 
 import cuenta.Cuenta;
 import interfaz.Utilitarios;
+import main.Usuario;
 
 public class InversionDivisa extends Inversion {
 
@@ -11,9 +12,9 @@ public class InversionDivisa extends Inversion {
 
 	private double cotizacionInicial;
 
-	public InversionDivisa(Cuenta cuenta, double monto, int plazoDias, String divisa, double tasa) {
+	public InversionDivisa(Cuenta cuenta, double monto, int plazoDias, String divisa, double tasa, Usuario usuario) {
 
-		super(cuenta, monto, plazoDias);
+		super(cuenta, monto, plazoDias, usuario);
 
 		this.divisa = divisa;
 
@@ -33,12 +34,12 @@ public class InversionDivisa extends Inversion {
 	public double getTasa() {
 		return tasa;
 	}
-
+	
 	@Override
-	public void precancelar() {
-
+	public double calcularResultado() {
+		
 		if (!activa)
-			return;
+			return 0.0;
 
 		long dias = java.time.temporal.ChronoUnit.DAYS.between(fechaInicio, Utilitarios.hoy());
 
@@ -47,15 +48,33 @@ public class InversionDivisa extends Inversion {
 
 		double interesesDivisa = cantidadDivisas * (tasa / 365.0) * dias;
 
-		interesesDivisa /= 2.0;
-
 		double cotizacionActual = Utilitarios.consultarCotizacion(divisa);
 
-		double pesosDevueltos = (cantidadDivisas + interesesDivisa) * cotizacionActual;
+		return (cantidadDivisas + interesesDivisa) * cotizacionActual;
+		
+	}
 
-		cuenta.acreditar(pesosDevueltos);
+	@Override
+	public void precancelar() {
 
-		activa = false;
+		if(activa) {
+			
+			long dias = java.time.temporal.ChronoUnit.DAYS.between(fechaInicio, Utilitarios.hoy());
+			
+			double cantidadDivisas = montoInvertido / cotizacionInicial;
+
+			double interesesDivisa = cantidadDivisas * (tasa / 365.0) * dias;
+			
+			interesesDivisa /= 2.0;
+			
+			double cotizacionActual = Utilitarios.consultarCotizacion(divisa);
+			
+			double totalAcreditar = (cantidadDivisas + interesesDivisa) * cotizacionActual;
+			
+			cuenta.acreditar(totalAcreditar);
+			
+			this.activa = false;
+		}
 	}
 
 	@Override
@@ -68,8 +87,13 @@ public class InversionDivisa extends Inversion {
 		else
 			estado = "Rechazada";
 
-		return "fecha: " + fecha + "\norigen: " + cuenta.getCvu() + "\ndesc: Divisa " + divisa + "\nmonto: " + monto
-				+ "\nplazo: " + plazoDias + "\n" + estado;
+		return
+    		"\u25CB Inversion:\n" +
+    		"   \u25A0 fecha: " + fecha + "\n" +
+    		"     origen: " + usuario.getDni() + " (" + cuenta.getCvu() + ")\n" +
+    		"     desc: Divisa " + divisa + "\n" +
+    		"     monto: " + monto + "\n" +
+    		"     plazo: " + plazoDias + "\n" +
+    		"     " + estado;
 	}
-
 }
