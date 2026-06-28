@@ -8,20 +8,20 @@ public class FondoLiquidezEmpresarial extends Inversion {
 
 	private static final double MONTO_MINIMO = 20000000;
 	
-	private String activoFondoLiquidez;
+	private static final String activoFondoLiquidez = "FLE"; // Activo llamado "FLE"
 	
-	private double tasaInteresFondoLiquidez;
+	private static final double tasaInteresFondoLiquidez = 0.08; // Activo con una tasa del 8% 
 
 	public FondoLiquidezEmpresarial(Cuenta cuenta, double monto, int plazoDias, Usuario usuario) {
 
 		super(cuenta, monto, plazoDias, usuario);
 
 		if (monto < MONTO_MINIMO)
-			throw new IllegalArgumentException("El fondo requiere minimo 20 millones");
+			throw new IllegalArgumentException("El fondo requiere un mínimo de " MONTO_MINIMO);
 		
-		this.tasaInteresFondoLiquidez = 0.08; //Porcentaje del 8%
+		this.tasa = tasaInteresFondoLiquidez; //Porcentaje del 8%
 		
-		this.activoFondoLiquidez = "FLE"; 
+		this.activo = activoFondoLiquidez; // Activo FLE
 	}
 
 	public int getId() {
@@ -40,9 +40,9 @@ public class FondoLiquidezEmpresarial extends Inversion {
 		
 		long dias = java.time.temporal.ChronoUnit.DAYS.between(fechaInicio, Utilitarios.hoy());
 		
-		double cotizacionFLE = Utilitarios.consultarCotizacion(activoFondoLiquidez);
+		double cotizacionFLE = Utilitarios.consultarCotizacion(activo);
 		
-		double intereses = montoInvertido * (tasaInteresFondoLiquidez / 365.0) * dias * cotizacionFLE;
+		double intereses = montoInvertido * (tasa / 365.0) * dias * cotizacionFLE;
 		
 		return montoInvertido + intereses;
 		
