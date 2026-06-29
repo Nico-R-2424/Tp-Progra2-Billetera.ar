@@ -57,30 +57,30 @@ public abstract class Cuenta {
 		saldoDisponible += monto;
 	}
 
-	public void agregarActividad(Transferencia t) {
+	public void agregarActividad(Transferencia transferencia) {
 
-		actividades.put(t.getId(), t);
-
-		volumenTransacciones++;
-	}
-
-	public void agregarActividad(InversionRentaFija inv) {
-
-		actividades.put(inv.getId(), inv);
+		actividades.put(transferencia.getId(), transferencia);
 
 		volumenTransacciones++;
 	}
 
-	public void agregarActividad(InversionDivisa inv) {
+	public void agregarActividad(InversionRentaFija inversion) {
 
-		actividades.put(inv.getId(), inv);
+		actividades.put(inversion.getId(), inversion);
 
 		volumenTransacciones++;
 	}
 
-	public void agregarActividad(FondoLiquidezEmpresarial inv) {
+	public void agregarActividad(InversionDivisa inversion) {
 
-		actividades.put(inv.getId(), inv);
+		actividades.put(inversion.getId(), inversion);
+
+		volumenTransacciones++;
+	}
+
+	public void agregarActividad(FondoLiquidezEmpresarial inversion) {
+
+		actividades.put(inversion.getId(), inversion);
 
 		volumenTransacciones++;
 	}

@@ -116,6 +116,9 @@ public class Billetera implements IBilletera {
 			throw new IllegalArgumentException("Alias existente");
 
 		String cvu = Utilitarios.generarSiguienteCvu();
+		
+		if (depositoInicial < CuentaPremium.MONTO_MINIMO)
+			throw new IllegalArgumentException("Cuenta Premium requiere minimo: " + CuentaPremium.MONTO_MINIMO);
 
 		CuentaPremium cuenta = new CuentaPremium(cvu, alias, depositoInicial);
 
@@ -274,8 +277,8 @@ public class Billetera implements IBilletera {
 		
 		Cuenta cuenta = usuario.getCuenta(cvu);
 
-		if (usuario == null || cuenta == null||!(cuenta instanceof CuentaCorporativa))
-			throw new IllegalArgumentException("El fondo requiere minimo 20 millones");
+		if (usuario == null || cuenta == null||!(cuenta instanceof CuentaCorporativa) || monto < FondoLiquidezEmpresarial.MONTO_MINIMO)
+			throw new IllegalArgumentException("El fondo requiere minimo de " + FondoLiquidezEmpresarial.MONTO_MINIMO);
 
 		FondoLiquidezEmpresarial inversion = new FondoLiquidezEmpresarial(cuenta, monto, plazoDias, usuario);
 		

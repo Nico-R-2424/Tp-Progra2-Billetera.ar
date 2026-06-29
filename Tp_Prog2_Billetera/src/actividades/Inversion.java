@@ -20,15 +20,15 @@ public abstract class Inversion extends Actividad {
 
     protected boolean activa;
 
-    public Inversion(Cuenta cuenta, double monto, int plazoDias, Usuario usuario) {
+    public Inversion(Cuenta cuenta, double montoAInvertir, int plazoDias, Usuario usuario) {
 
-        super(monto);
+        super(montoAInvertir);
 
         this.cuenta = cuenta;
         
         this.usuario = usuario;
 
-        this.montoInvertido = monto;
+        this.montoInvertido = montoAInvertir;
 
         this.plazoDias = plazoDias;
 

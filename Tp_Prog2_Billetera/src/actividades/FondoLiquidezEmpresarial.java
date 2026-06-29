@@ -1,27 +1,19 @@
 package actividades;
 
 import cuenta.Cuenta;
-import main.Usuario;
 import interfaz.Utilitarios;
+import main.Usuario;
 
 public class FondoLiquidezEmpresarial extends Inversion {
 
-	private static final double MONTO_MINIMO = 20000000;
+	public static final double MONTO_MINIMO = 20000000.0;
 	
-	private String activo;
-	
-	private double tasa;
+	public static final String activoFondoLiquidez = "FLE"; // Activo llamado "FLE"
 
-	public FondoLiquidezEmpresarial(Cuenta cuenta, double monto, int plazoDias, Usuario usuario) {
+	public FondoLiquidezEmpresarial(Cuenta cuenta, double montoAInvertir, int plazoDias, Usuario usuario) {
 
-		super(cuenta, monto, plazoDias, usuario);
-
-		if (monto < MONTO_MINIMO)
-			throw new IllegalArgumentException("El fondo requiere minimo 20 millones");
+		super(cuenta, montoAInvertir, plazoDias, usuario);
 		
-		this.tasa = 0.08;
-		
-		this.activo = "FLE";
 	}
 
 	public int getId() {
@@ -40,9 +32,9 @@ public class FondoLiquidezEmpresarial extends Inversion {
 		
 		long dias = java.time.temporal.ChronoUnit.DAYS.between(fechaInicio, Utilitarios.hoy());
 		
-		double cotizacionFLE = Utilitarios.consultarCotizacion(activo);
+		double tasaActual = Utilitarios.consultarCotizacion(activoFondoLiquidez);
 		
-		double intereses = montoInvertido * (tasa / 365.0) * dias * cotizacionFLE;
+		double intereses = montoInvertido * (tasaActual / 365.0) * dias;
 		
 		return montoInvertido + intereses;
 		
@@ -64,8 +56,14 @@ public class FondoLiquidezEmpresarial extends Inversion {
 		else
 			estado = "Rechazada";
 
-		return "○ Inversion:" + "\n            ■   fecha: " + fecha + "\n                origen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\n                desc: Fondo Liquidez Empresarial " + "\n                monto: " + monto + "\n                plazo: " + plazoDias + "\n                " + estado;
-		
+		return
+    		"\u25CB Inversion:\n" +
+    		"            \u25A0  fecha: " + fecha + "\n" +
+    		"               origen: " + usuario.getDni() + " (" + cuenta.getCvu() + ")\n" +
+    		"               desc: Fondo Liquidez Empresarial" + "\n" +
+    		"               monto: " + monto + "\n" +
+    		"               plazo: " + plazoDias + "\n" +
+    		"               " + estado;
 	}
 
 }

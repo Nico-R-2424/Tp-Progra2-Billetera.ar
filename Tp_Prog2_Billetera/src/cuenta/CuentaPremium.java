@@ -2,14 +2,11 @@ package cuenta;
 
 public class CuentaPremium extends Cuenta {
 
-	private static final double MONTO_MINIMO = 500000;
+	public static final double MONTO_MINIMO = 500000;
 
 	public CuentaPremium(String cvu, String alias, double depositoInicial) {
 
 		super(cvu, alias);
-
-		if (depositoInicial < MONTO_MINIMO)
-			throw new IllegalArgumentException("Cuenta Premium requiere minimo: " + MONTO_MINIMO);
 
 		this.saldoDisponible = depositoInicial;
 	}
@@ -21,7 +18,7 @@ public class CuentaPremium extends Cuenta {
 	@Override
 	public String toString() {
 
-		return "Premium: " + alias + " (" + cvu + ")";
+		return "\u25CB  Premium: " + alias + " (" + cvu + ")";
 	}
 
 }

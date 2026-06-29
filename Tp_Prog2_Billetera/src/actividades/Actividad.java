@@ -2,6 +2,8 @@ package actividades;
 
 import java.time.LocalDate;
 
+import interfaz.Utilitarios;
+
 public abstract class Actividad {
 
 	protected static int contadorId = 1;
@@ -14,7 +16,8 @@ public abstract class Actividad {
 	public Actividad(double monto) {
 
 		this.id = contadorId++;
-		this.fecha = LocalDate.now(); // después podemos cambiar a Utilitarios.hoy()
+		
+		this.fecha = Utilitarios.hoy(); 
 
 		this.monto = monto;
 

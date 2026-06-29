@@ -1,8 +1,8 @@
 package actividades;
 
 import cuenta.Cuenta;
-import main.Usuario;
 import interfaz.Utilitarios;
+import main.Usuario;
 
 public class InversionDivisa extends Inversion {
 
@@ -12,9 +12,9 @@ public class InversionDivisa extends Inversion {
 
 	private double cotizacionInicial;
 
-	public InversionDivisa(Cuenta cuenta, double monto, int plazoDias, String divisa, double tasa, Usuario usuario) {
+	public InversionDivisa(Cuenta cuenta, double montoAInvertir, int plazoDias, String divisa, double tasa, Usuario usuario) {
 
-		super(cuenta, monto, plazoDias, usuario);
+		super(cuenta, montoAInvertir, plazoDias, usuario);
 
 		this.divisa = divisa;
 
@@ -87,8 +87,14 @@ public class InversionDivisa extends Inversion {
 		else
 			estado = "Rechazada";
 
-		return "○ Inversion:" + "\n            ■   fecha: " + fecha + "\n                origen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\n                desc: Divisa " + divisa + "\n                monto: " + monto + "\n                plazo: " + plazoDias + "\n                " + estado;
-		
+		return "\u25CB Inversion:\n" + 
+		"            \u25A0  fecha: " + fecha + "\n"+
+		"               origen: " + usuario.getDni() + "(" + cuenta.getCvu() + ")" + "\n" +
+		"               desc: Divisa " + divisa + "\n" +
+		"               monto: " + monto + "\n" + 
+		"               plazo: " + plazoDias + "\n" + 
+		"               " + estado;
+    		
 	}
-
+	
 }

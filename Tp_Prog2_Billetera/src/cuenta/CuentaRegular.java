@@ -27,7 +27,7 @@ public class CuentaRegular extends Cuenta {
 	@Override
 	public String toString() {
 
-		return "Regular: " + alias + " (" + cvu + ")";
+		return "\u25CB  Regular: " + alias + " (" + cvu + ")";
 	}
 
 }

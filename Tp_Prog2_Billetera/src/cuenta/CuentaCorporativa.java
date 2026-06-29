@@ -23,7 +23,7 @@ public class CuentaCorporativa extends Cuenta {
 	@Override
 	public String toString() {
 
-		return "Corporativa: " + alias + " (" + cvu + ")";
+		return "\u25CB  Corporativa: " + alias + " (" + cvu + ")";
 	}
 
 }

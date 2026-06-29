@@ -139,7 +139,7 @@ public class Principal {
         System.out.println("[8] Estado final de la billetera: ");
         System.out.println(billetera);
         System.out.println("-------------------------------------------------\n");
-
+        
         System.out.println("=================================================");
         System.out.println("      SIMULACIÓN COMPLETADA EXITOSAMENTE         ");
         System.out.println("=================================================");
